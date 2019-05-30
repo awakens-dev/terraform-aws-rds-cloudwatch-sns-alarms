@@ -1,6 +1,6 @@
-variable "db_instance_id" {
-  description = "The instance ID of the RDS database instance that you want to monitor."
-  type        = "string"
+variable "db_instance" {
+  description = "The RDS database instance that you want to monitor."
+  type        = any
 }
 
 variable "burst_balance_threshold" {
