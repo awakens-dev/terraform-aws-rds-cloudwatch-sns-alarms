@@ -1,20 +1,20 @@
 # resource "aws_cloudwatch_event_target" "sns" {
 #   rule       = "${aws_cloudwatch_event_rule.default.name}"
 #   target_id  = "SendToSNS"
-#   arn        = "${aws_sns_topic.default.arn}"
+#   arn        = "${var.sns_topic.arn}"
 #   depends_on = ["aws_cloudwatch_event_rule.default"]
 #   input      = "${var.sns_message_override}"
 # }
 data "aws_caller_identity" "default" {}
 
 # Make a topic
-resource "aws_sns_topic" "default" {
-  name_prefix = "rds-threshold-alerts"
-}
+# resource "aws_sns_topic" "default" {
+#   name_prefix = "rds-threshold-alerts"
+# }
 
 resource "aws_db_event_subscription" "default" {
   name_prefix = "rds-event-sub"
-  sns_topic   = aws_sns_topic.default.arn
+  sns_topic   = var.sns_topic.arn
 
   source_type = "db-instance"
   source_ids  = [var.db_instance.id]
@@ -32,7 +32,7 @@ resource "aws_db_event_subscription" "default" {
 }
 
 resource "aws_sns_topic_policy" "default" {
-  arn    = aws_sns_topic.default.arn
+  arn    = var.sns_topic.arn
   policy = data.aws_iam_policy_document.sns_topic_policy.json
 }
 
@@ -55,7 +55,7 @@ data "aws_iam_policy_document" "sns_topic_policy" {
     ]
 
     effect    = "Allow"
-    resources = [aws_sns_topic.default.arn]
+    resources = [var.sns_topic.arn]
 
     principals {
       type        = "AWS"
@@ -75,7 +75,7 @@ data "aws_iam_policy_document" "sns_topic_policy" {
   statement {
     sid       = "Allow CloudwatchEvents"
     actions   = ["sns:Publish"]
-    resources = [aws_sns_topic.default.arn]
+    resources = [var.sns_topic.arn]
 
     principals {
       type        = "Service"
@@ -86,7 +86,7 @@ data "aws_iam_policy_document" "sns_topic_policy" {
   statement {
     sid       = "Allow RDS Event Notification"
     actions   = ["sns:Publish"]
-    resources = [aws_sns_topic.default.arn]
+    resources = [var.sns_topic.arn]
 
     principals {
       type        = "Service"

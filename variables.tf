@@ -3,6 +3,10 @@ variable "db_instance" {
   type        = any
 }
 
+variable "sns_topic" {
+  type = any
+}
+
 variable "burst_balance_threshold" {
   description = "The minimum percent of General Purpose SSD (gp2) burst-bucket I/O credits available."
   type        = "string"
